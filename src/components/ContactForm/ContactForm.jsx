@@ -1,18 +1,43 @@
-import {useState} from "react";
-import { PropTypes } from 'prop-types';
 import styles  from '../ContactForm/ContactForm.module.css';
 
-export const ContactForm =({onSubmit})=> { 
-  
+import {useState} from "react";
+
+import { useSelector, useDispatch } from 'react-redux';
+import {setInContacts} from '../../redux/contacts/contacts.slice';
+
+const getRandomID=()=> {
+  return `${Math.floor(Math.random() * 16777215).toString(16)}`;
+};
+
+export const ContactForm =()=> { 
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.data);
+
   const [name,setInName] = useState(''); 
   const [number,setInNumber] = useState('');
 
   const handleChange = event => {    
     const { name, value } = event.target;    
-    name==='name'?setInName(value):setInNumber(value);     
+    name==='name'?setInName(value):setInNumber(value);      
   };
 
-  const handleFormSubmit = evt => {
+  const isContactInState = ({ name }) =>
+  !!contacts.filter(({name: prevName}) => {return prevName === name}).length;
+
+  const onSubmit = ({ name, number }) => { 
+    if (isContactInState({ name })) {
+      alert('Contact is in phonebook');
+      return;    
+    }   
+    
+    dispatch(
+      setInContacts(
+        {id:getRandomID(), name, number }   
+        ), 
+    );         
+  };
+
+  const handleFormSubmit = evt => {   
     evt.preventDefault();    
     onSubmit({ name, number });
     setInName('');
@@ -52,7 +77,7 @@ export const ContactForm =({onSubmit})=> {
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
         />
-      </div>               
+      </div>     
 
       <button className={styles.button} type="submit">
         Add contact
@@ -61,6 +86,3 @@ export const ContactForm =({onSubmit})=> {
   );    
 }
 
-ContactForm.propTypes = {
-  onSubmit:PropTypes.func,
-}
