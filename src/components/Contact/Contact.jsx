@@ -1,14 +1,18 @@
-import { PropTypes } from 'prop-types';
+
 import styles  from '../Contact/Contact.module.css';
+import { useSelector, useDispatch } from 'react-redux';
+import {deleteContactsAction} from '../../redux/contacts/contacts.slice';
 
 
-export const Contact = ({contact,onDelete}) => {
-  const {id,name,number} = contact;
+export const Contact = () => { 
+  const contacts = useSelector(state => state.contacts.data);  
+  const {name,number} = contacts;
+  const dispatch = useDispatch();  
 
-  const handleDelete =() =>{
-    onDelete(id);
+  const handleDelete = id => {
+    dispatch(deleteContactsAction(id));    
   };
-
+  
   return (        
     <div className={styles.link}>
       <li> {name} : {number}</li> 
@@ -17,7 +21,3 @@ export const Contact = ({contact,onDelete}) => {
   );
 };
 
-Contact.propTypes = {         
-  contact:  PropTypes.shape(),
-  onDelete:PropTypes.func
-}
